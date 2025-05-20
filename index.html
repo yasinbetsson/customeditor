@@ -24,11 +24,9 @@
             const field = new SquidexFormField();
 
             field.onInit((context) => {
-                // Fetch the references with a custom filter.
-                console.log(context);
-                
+                // Fetch the references with a custom filter.                
                 fetch(
-                    `${context.apiUrl}/content/${context.appName}/references?filter=data/isActive/iv eq true`,
+                    `${context.apiUrl}/content/${context.appName}/brands`,
                     {
                         headers: {
                             Authorization: `Bearer ${context.user.user.access_token}`,
@@ -40,7 +38,7 @@
                         for (var item of x.items) {
                             // Use the title field as option text.
                             element.add(
-                                new Option(item.data.title.iv, item.id)
+                                new Option(item.data.name.iv, item.id)
                             );
                         }
 
