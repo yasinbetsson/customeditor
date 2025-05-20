@@ -25,6 +25,8 @@
 
             field.onInit((context) => {
                 // Fetch the references with a custom filter.
+                console.log(context);
+                
                 fetch(
                     `${context.apiUrl}/content/${context.appName}/references?filter=data/isActive/iv eq true`,
                     {
