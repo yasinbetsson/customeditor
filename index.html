@@ -8,19 +8,51 @@
     <script src="https://cloud.squidex.io/scripts/editor-sdk.js"></script>
 
     <link rel="stylesheet" type="text/css" href="https://cloud.squidex.io/styles.css">
+
+    <style>
+        * {
+            font-size: 16px;
+        }
+
+        fieldset {
+            border: 2px solid #6c5ce7;
+            border-radius: 6px;
+            margin-top: 10px;
+            max-height: 400px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+        }
+
+        fieldset .cs-checkbox {
+            margin-left: 10px;
+        }
+
+        legend {
+            padding-left: 12px;
+            padding-right: 12px;
+            font-weight: bold;
+            font-size: 12px;
+            color: #475161;
+        }
+    </style>
 </head>
 
 <body>
-        <select class="form-select" id="editor">
-            <option></option>
-        </select>
+    <div class="cs-checkbox">
+        <label>
+            <input type="checkbox" class="cs" id="common" value="common">
+            <span class="lbl">common</span>
+        </label>
+    </div>
+    <fieldset>
+        <legend>Choose brands for override</legend>
+    </fieldset>
 
-        <script>
-            const element = document.getElementById("editor");
+    <script>
+        (() => {
+            window.extensionField = {};
 
-            // When the field is instantiated it notifies the UI that it has been loaded.
-            //
-            // Furthermore it sends the current size to the parent.
             const field = new SquidexFormField();
 
             field.onInit((context) => {
@@ -35,48 +67,99 @@
                 )
                     .then((x) => x.json())
                     .then((x) => {
-                        for (var item of x.items) {
-                            // Use the title field as option text.
-                            element.add(
-                                new Option(item.data.name.iv, item.id)
-                            );
-                        }
-
+                        const brandNames = x.items.map(item => item.data.name.iv);
                         // Update the value again for the new options.
-                        updateValue(field.getValue());
+                        renderFieldUI(brandNames);
+                        updateCheckboxes(field.getValue());
+                        updateHeight();
                     });
             });
 
-            // Handle the value change event and set the text to the editor.
             field.onValueChanged(function (value) {
-                updateValue(value);
+                updateCheckboxes(value);
             });
 
-            // Disable the editor when it should be disabled.
-            field.onDisabled(function (disabled) {
-                updateDisabled(disabled);
-            });
+            function renderFieldUI(config) {
+                const commonCheckbox = document.getElementById('common');
 
-            element.addEventListener("change", (event) => {
-                if (element.value) {
-                    field.valueChanged([element.value]);
-                } else {
-                    field.valueChanged([]);
-                }
-            });
+                const domFragment = document.createDocumentFragment();
+                config.brands.sort().forEach(brand => domFragment.appendChild(createCheckbox(brand)));
 
-            function updateDisabled(disabled) {
-                element.disabled = disabled;
+                const fieldset = document.getElementsByTagName('fieldset');
+                fieldset?.[0].appendChild(domFragment);
+
+                commonCheckbox.addEventListener('click', (e) => {
+                    if (commonCheckbox.checked) {
+                        const brandCheckboxes = document.querySelectorAll('fieldset input');
+                        brandCheckboxes.forEach(brandCheckbox => brandCheckbox.checked = false);
+                    } else {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    updateFieldValue();
+                });
             }
 
-            function updateValue(value) {
-                if (Array.isArray(value) && value.length > 0) {
-                    element.value = value[0];
-                } else {
-                    element.value = undefined;
+            function updateCheckboxes(values = []) {
+                if (values.length === 0) {
+                    const commonCheckbox = document.getElementById('common');
+                    commonCheckbox.checked = true;
+                    updateFieldValue();
+
+                    return;
                 }
+
+                const checkboxes = document.getElementsByTagName('input');
+                [...checkboxes]
+                    .filter(checkbox => values.indexOf(checkbox.value) >= 0)
+                    .forEach(checkbox => checkbox.checked = true);
             }
-        </script>
-    </body>
+
+            function createCheckbox(brand) {
+                const checkboxContainer = document.createElement('div');
+                checkboxContainer.classList.add('cs-checkbox');
+
+                const label = document.createElement('label');
+
+                const span = document.createElement('span');
+                span.classList.add('lbl');
+                span.textContent = brand;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = brand;
+                checkbox.classList.add('cs');
+                checkbox.addEventListener('click', () => {
+                    const commonCheckbox = document.getElementById('common');
+                    const brandCheckboxes = document.querySelectorAll('fieldset input');
+                    commonCheckbox.checked = ![...brandCheckboxes].some(checkbox => checkbox.checked);
+                    updateFieldValue();
+                });
+
+                label.appendChild(checkbox);
+                label.appendChild(span);
+
+                checkboxContainer.appendChild(label);
+
+                return checkboxContainer;
+            }
+
+            function updateFieldValue() {
+                const checkboxes = document.getElementsByTagName('input');
+                const values = [...checkboxes]
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+
+
+                field.valueChanged(values);
+            }
+
+            function updateHeight() {
+                extensionField.window.updateHeight();
+            }
+        })();
+    </script>
+</body>
 
 </html>
