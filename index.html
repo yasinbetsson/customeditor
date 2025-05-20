@@ -41,7 +41,7 @@
 <body>
     <div class="cs-checkbox">
         <label>
-            <input type="checkbox" class="cs" id="common" value="common">
+            <input type="checkbox" class="form-check-input" id="common" value="common">
             <span class="lbl">common</span>
         </label>
     </div>
@@ -129,7 +129,7 @@
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.value = brand;
-                checkbox.classList.add('cs');
+                checkbox.classList.add('form-check-input');
                 checkbox.addEventListener('click', () => {
                     const commonCheckbox = document.getElementById('common');
                     const brandCheckboxes = document.querySelectorAll('fieldset input');
