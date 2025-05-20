@@ -109,7 +109,7 @@
 
             function updateCheckboxes(values = []) {
                 const valuePreview = document.getElementById('valuePreview');
-                valuePreview.innerText = JSON.stringify(value, null, 2);
+                valuePreview.innerText = JSON.stringify(values, null, 2);
                 if (values.length === 0) {
                     const commonCheckbox = document.getElementById('common');
                     commonCheckbox.checked = true;
