@@ -16,11 +16,15 @@
 
 <body>
     <textarea name="content" id="editor"></textarea>
+    <textarea id="logs" rows="10" cols="10"></textarea>
 
     <script>
         var element = document.getElementById('editor');
+        var logs = document.getElementById('logs');
 
         var field = new SquidexFormField();
+
+        logs.value = field.getContext();
 
         field.onValueChanged(function (value) {
             if (value) {
@@ -30,6 +34,10 @@
 
         field.onDisabled(function (disabled) {
             element.disabled = disabled;
+        });
+
+         field.onContextChanged(function () {
+            logs.value = field.getContext();
         });
     </script>
 </body>
