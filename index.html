@@ -83,7 +83,7 @@
                 const commonCheckbox = document.getElementById('common');
 
                 const domFragment = document.createDocumentFragment();
-                config.brands.sort().forEach(brand => domFragment.appendChild(createCheckbox(brand)));
+                config.sort().forEach(brand => domFragment.appendChild(createCheckbox(brand)));
 
                 const fieldset = document.getElementsByTagName('fieldset');
                 fieldset?.[0].appendChild(domFragment);
