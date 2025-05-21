@@ -60,9 +60,12 @@
             const field = new SquidexFormField();
 
             field.onInit((context) => {
+                const queryParams = new URLSearchParams(window.location.search);
+                const brandsContentType = queryParams.get('brandsContentType');
+
                 // Fetch the references with a custom filter.                
                 fetch(
-                    `${context.apiUrl}/content/${context.appName}/brands`,
+                    `${context.apiUrl}/content/${context.appName}/${brandsContentType}`,
                     {
                         headers: {
                             Authorization: `Bearer ${context.user.user.access_token}`,
