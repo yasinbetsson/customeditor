@@ -19,17 +19,25 @@
         }
 
         fieldset {
-            border: 2px solid #6c5ce7;
+            border: 2px solid #00aaff;
             border-radius: 6px;
             margin-top: 10px;
-            max-height: 400px;
-            display: flex;
-            flex-direction: column;
-            flex-wrap: wrap;
         }
 
-        fieldset .cs-checkbox {
-            margin-left: 10px;
+        fieldset .cs-checkbox label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+
+            gap: 0.3rem;
+        }
+
+        .brand-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+
+            padding: .5rem;
         }
 
         legend {
@@ -46,11 +54,12 @@
     <div class="cs-checkbox">
         <label>
             <input type="checkbox" class="form-check-input" id="common" value="common">
-            <span class="lbl">common</span>
+            <span class="lbl">Common</span>
         </label>
     </div>
     <fieldset>
         <legend>Choose brands for override</legend>
+        <div class="brand-list"></div>
     </fieldset>
 
     <script>
@@ -59,11 +68,26 @@
 
             const field = new SquidexFormField();
 
+            const queryParams = new URLSearchParams(window.location.search);
+            const testing = queryParams.get('testing');
+
+            if (testing) {
+                // For testing purposes, we can use a static list of brands.
+                const staticBrands = [
+                    'Brand A', 'Brand C', 'Brand B', 'Brand D',
+                    'Brand E', 'Brand F', 'Brand G', 'Brand H',
+                    'Brand I', 'Brand J', 'Brand K', 'Brand L',
+                    'Brand M', 'Brand N', 'Brand O', 'Brand P',
+                ];
+                renderFieldUI(staticBrands);
+                updateCheckboxes(field.getValue());
+                return;
+            }
+
             field.onInit((context) => {
-                const queryParams = new URLSearchParams(window.location.search);
                 const brandsContentType = queryParams.get('brandsContentType');
 
-                // Fetch the references with a custom filter.                
+                // Fetch the references with a custom filter.
                 fetch(
                     `${context.apiUrl}/content/${context.appName}/${brandsContentType}`,
                     {
@@ -78,27 +102,25 @@
                         // Update the value again for the new options.
                         renderFieldUI(brandNames);
                         updateCheckboxes(field.getValue());
-                        updateHeight();
                     });
             });
 
             field.onValueChanged(function (value) {
                 updateCheckboxes(value);
-                
             });
 
-            function renderFieldUI(config) {
+            function renderFieldUI(brands) {
                 const commonCheckbox = document.getElementById('common');
 
                 const domFragment = document.createDocumentFragment();
-                config.sort().forEach(brand => domFragment.appendChild(createCheckbox(brand)));
+                brands.sort().forEach(brand => domFragment.appendChild(createCheckbox(brand)));
 
-                const fieldset = document.getElementsByTagName('fieldset');
-                fieldset?.[0].appendChild(domFragment);
+                const brandListContainer = document.querySelector('.brand-list');
+                brandListContainer.appendChild(domFragment);
 
                 commonCheckbox.addEventListener('click', (e) => {
                     if (commonCheckbox.checked) {
-                        const brandCheckboxes = document.querySelectorAll('fieldset input');
+                        const brandCheckboxes = document.querySelectorAll('.brand-list input');
                         brandCheckboxes.forEach(brandCheckbox => brandCheckbox.checked = false);
                     } else {
                         e.preventDefault();
@@ -117,6 +139,8 @@
                 if (values.length === 0) {
                     const commonCheckbox = document.getElementById('common');
                     commonCheckbox.checked = true;
+
+                    // Set default value to 'common' if no values are provided
                     updateFieldValue();
 
                     return;
@@ -125,7 +149,7 @@
                 [...checkboxes]
                     .filter(checkbox => values.indexOf(checkbox.value) >= 0)
                     .forEach(checkbox => checkbox.checked = true);
-                    
+
             }
 
             function createCheckbox(brand) {
@@ -144,7 +168,7 @@
                 checkbox.classList.add('form-check-input');
                 checkbox.addEventListener('click', () => {
                     const commonCheckbox = document.getElementById('common');
-                    const brandCheckboxes = document.querySelectorAll('fieldset input');
+                    const brandCheckboxes = document.querySelectorAll('.brand-list input');
                     commonCheckbox.checked = ![...brandCheckboxes].some(checkbox => checkbox.checked);
                     updateFieldValue();
                 });
@@ -163,12 +187,7 @@
                     .filter(checkbox => checkbox.checked)
                     .map(checkbox => checkbox.value);
 
-
                 field.valueChanged(values);
-            }
-
-            function updateHeight() {
-                // extensionField.window.updateHeight();
             }
         })();
     </script>
