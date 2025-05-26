@@ -10,16 +10,12 @@
     <link rel="stylesheet" type="text/css" href="https://cloud.squidex.io/styles.css">
 
     <style>
-        * {
-            font-size: 16px;
-        }
-
         body {
             background-color: #fff;
         }
 
         fieldset {
-            border: 2px solid #00aaff;
+            border: 2px solid #666;
             border-radius: 6px;
             margin-top: 10px;
         }
@@ -33,14 +29,18 @@
         }
 
         .brand-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 0.5rem;
-
-            padding: .5rem;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            gap: 2px 10px;
+            max-height: 300px;
+            max-width: 100%;
+            overflow: auto;
+            padding: 0.2rem 0.5rem;
         }
 
         legend {
+            position: relative;
             padding-left: 12px;
             padding-right: 12px;
             font-weight: bold;
@@ -78,6 +78,9 @@
                     'Brand E', 'Brand F', 'Brand G', 'Brand H',
                     'Brand I', 'Brand J', 'Brand K', 'Brand L',
                     'Brand M', 'Brand N', 'Brand O', 'Brand P',
+                    'Brand Q', 'Brand R', 'Brand S', 'Brand T',
+                    'Brand U', 'Brand V', 'Brand W', 'Brand X',
+                    'Brand Y', 'Brand Z'
                 ];
                 renderFieldUI(staticBrands);
                 updateCheckboxes(field.getValue());
