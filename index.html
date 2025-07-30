@@ -135,7 +135,12 @@
             });
         });
 
+        let skipFirstValueChange = true;
         field.onValueChanged(function (value) {
+          if (skipFirstValueChange) {
+            skipFirstValueChange = false;
+            return;
+          }
           if (
             value === null ||
             value === undefined ||
